@@ -7,5 +7,16 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "aceky",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "faiss-node": "^0.5.1",
+    "hnswlib-node": "^1.4.2",
+    "langchain": "^0.0.200",
+    "openai": "^4.20.1",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/pdf-parse": "^1.1.4"
+  }
 }
