@@ -34,7 +34,7 @@ export const initChatHandler = async (
       chain
     );
     const summary = await ask("Summarize the document.", chain);
-    // console.log(questions.text.split(/\r?\n/), summary.text);
+    console.log(questions.text.split(/\r?\n/), summary.text);
     cache[req.session.id] = chain;
     deleteFile(filename);
     return res.status(200).json({
@@ -42,6 +42,7 @@ export const initChatHandler = async (
       questions: [...questions.text.split(/\r?\n/)],
     });
   } catch (error: any) {
+    console.trace(error);
     return res.status(500).json({
       message: error.message,
     });
