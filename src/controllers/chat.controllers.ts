@@ -7,6 +7,8 @@ import { RequestWithCustomSession } from "../schemas/schema";
 import { Response } from "express";
 import { ask } from "../services/langchain.services";
 import { deleteFile, fetchFile } from "../helpers/file.helper";
+import path from "path";
+const tempDirectory = path.resolve(__dirname, "../tmp/");
 
 const cache: { [key: string]: ConversationalRetrievalQAChain } = {};
 
@@ -18,7 +20,8 @@ export const initChatHandler = async (
     console.log("init");
     const [document] = [req.body.document];
     const filename = (await fetchFile("doc", document)) as string;
-    const loader = new PDFLoader("src/tmp/" + filename);
+    console.log("file fetched successfully", filename);
+    const loader = new PDFLoader(path.resolve(tempDirectory, filename));
     const data = await loader.load();
     const textSplitter = new RecursiveCharacterTextSplitter({
       chunkSize: 1000,
