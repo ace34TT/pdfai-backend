@@ -35,7 +35,8 @@ export const initChatHandler = async (
     );
     let questions: any = await ask(
       documentData.dataFrame,
-      "Suggest 3 questions about this document"
+      "Suggest 3 questions about this document",
+      documentData.fullText
     );
     deleteFile(filename);
     console.log(questions);
