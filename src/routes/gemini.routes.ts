@@ -7,7 +7,7 @@ import upload from "../middlewares/multer.middleware";
 
 const router = express.Router();
 
-router.post("/init", upload.single("file"), initChatHandler);
+router.post("/init", initChatHandler);
 router.post("/ask", makeQueryHandler);
 
 export { router as GeminiRoutes };

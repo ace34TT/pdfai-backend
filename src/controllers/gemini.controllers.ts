@@ -3,7 +3,7 @@ import { RequestWithCustomSession } from "../schemas/schema";
 import { ConversationalRetrievalQAChain } from "langchain/chains";
 import { ask, init } from "../services/gemini.services";
 import { ContentEmbedding } from "@google/generative-ai";
-import { deleteFile } from "../helpers/file.helper";
+import { deleteFile, fetchFile } from "../helpers/file.helper";
 import { extractQuestions } from "../helpers/string.helper";
 const cache: {
   [key: string]: {
@@ -20,9 +20,10 @@ export const initChatHandler = async (
   req: RequestWithCustomSession,
   res: Response
 ) => {
+  const [document] = [req.body.document];
+  const filename = (await fetchFile("doc", document)) as string;
   try {
-    console.log("init with gemini");
-    const documentData = await init(req.file!.filename);
+    const documentData = await init(filename);
     cache[req.session.id] = {
       chain: null,
       dataFrame: documentData.dataFrame,
@@ -36,7 +37,7 @@ export const initChatHandler = async (
       documentData.dataFrame,
       "Suggest 3 questions about this document"
     );
-    deleteFile(req.file!.filename);
+    deleteFile(filename);
     console.log(questions);
     questions = questions.replace(/^\s*\n/gm, "");
     questions = questions.split(/\r?\n/) as string[];
@@ -46,14 +47,13 @@ export const initChatHandler = async (
     console.log("--------");
     if (questions.length === 4) questions.shift();
     console.log(questions);
-
     return res.status(200).json({
       sessionId: req.session.id,
       summary: summary,
       questions: questions,
     });
   } catch (error: any) {
-    if (req.file) deleteFile(req.file.filename);
+    if (req.file) deleteFile(filename);
     console.trace(error);
     return res.status(500).json({
       message: error.message,
