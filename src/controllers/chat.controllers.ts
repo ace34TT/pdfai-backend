@@ -1,16 +1,13 @@
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { ConversationalRetrievalQAChain } from "langchain/chains";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
-import { model, embedding } from "../configs/openai.config";
+import { embedding } from "../configs/openai.config";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { RequestWithCustomSession } from "../schemas/schema";
 import { Response } from "express";
-import { ask } from "../services/langchain.services";
+import { ask, init } from "../services/langchain.services";
 import { deleteFile, fetchFile } from "../helpers/file.helper";
 import path from "path";
-// import Session from "../models/session.model";
-
-const tempDirectory = path.resolve(__dirname, "../tmp/");
 
 const cache: { [key: string]: ConversationalRetrievalQAChain } = {};
 
@@ -22,18 +19,7 @@ export const initChatHandler = async (
     console.log("init");
     const [document] = [req.body.document];
     const filename = (await fetchFile("doc", document)) as string;
-    console.log("file fetched successfully", filename);
-    const loader = new PDFLoader(path.resolve(tempDirectory, filename));
-    const data = await loader.load();
-    const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1000,
-    });
-    const docs = await textSplitter.splitDocuments(data);
-    const vectorStore = await MemoryVectorStore.fromDocuments(docs, embedding);
-    const chain = ConversationalRetrievalQAChain.fromLLM(
-      model,
-      vectorStore.asRetriever()
-    );
+    const chain = await init(filename);
     const questions = await ask(
       "Give the 3 main question about this document",
       chain
@@ -55,7 +41,6 @@ export const initChatHandler = async (
     });
   }
 };
-
 export const makeQueryHandler = async (
   req: RequestWithCustomSession,
   res: Response

@@ -5,6 +5,15 @@ import session from "express-session";
 import { ChatRoutes } from "./routes/chat.routes";
 import mongoose from "mongoose";
 import MongoStore from "connect-mongo";
+import { embedModel, genAI, model } from "./configs/gemini.config";
+import { TaskType } from "@google/generative-ai";
+import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+import path from "path";
+import { embedFn, findBestPassage } from "./services/gemini.services";
+import { GeminiRoutes } from "./routes/gemini.routes";
+
+const tempDirectory = path.resolve(__dirname, "tmp/");
 
 const app = express();
 mongoose.connect(
@@ -36,7 +45,7 @@ app.use(
 );
 // !
 app.use("/api/chat/", ChatRoutes);
-
+app.use("/api/gemini/", GeminiRoutes);
 app.get("/", async (req: Request, res: Response) => {
   return res.json({
     message: "Hello world",
