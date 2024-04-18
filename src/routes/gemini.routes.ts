@@ -3,7 +3,6 @@ import {
   initChatHandler,
   makeQueryHandler,
 } from "../controllers/gemini.controllers";
-import upload from "../middlewares/multer.middleware";
 
 const router = express.Router();
 

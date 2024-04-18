@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
+require("dotenv").config();
 
-mongoose.connect(
-  "mongodb+srv://firebaseshift:WxfwN3QAP0WtNDOr@pdfai.imrvii4.mongodb.net/?retryWrites=true&w=majority",
-  {}
-);
+mongoose.connect(process.env.MONGODB_CONNECTION_STR!, {});
 
 export { mongoose };

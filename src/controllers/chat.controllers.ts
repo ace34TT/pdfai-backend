@@ -7,7 +7,6 @@ import { RequestWithCustomSession } from "../schemas/schema";
 import { Response } from "express";
 import { ask, init } from "../services/langchain.services";
 import { deleteFile, fetchFile } from "../helpers/file.helper";
-import path from "path";
 
 const cache: { [key: string]: ConversationalRetrievalQAChain } = {};
 
@@ -25,8 +24,6 @@ export const initChatHandler = async (
       chain
     );
     const summary = await ask("Summarize the document.", chain);
-    // const sessionDoc = new Session({ sessionId: req.session.id });
-    // await sessionDoc.save();
     cache[req.session.id] = chain;
     deleteFile(filename);
     return res.status(200).json({
@@ -46,11 +43,6 @@ export const makeQueryHandler = async (
   res: Response
 ) => {
   try {
-    // console.log("interacting", req.body.sessionId);
-    // const sessionDoc = await Session.findById(req.body.sessionId);
-    // if (!sessionDoc)
-    //   return res.status(403).json({ message: "chat not initialized" });
-    // console.log("found doc : ", sessionDoc.sessionId);
     const chain = cache[req.body.sessionId];
     if (!chain)
       return res.status(403).json({ message: "chat not initialized" });

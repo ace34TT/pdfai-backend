@@ -4,7 +4,6 @@ import { ConversationalRetrievalQAChain } from "langchain/chains";
 import { ask, init } from "../services/gemini.services";
 import { ContentEmbedding } from "@google/generative-ai";
 import { deleteFile, fetchFile } from "../helpers/file.helper";
-import { extractQuestions } from "../helpers/string.helper";
 const cache: {
   [key: string]: {
     chain: ConversationalRetrievalQAChain | null;
@@ -39,15 +38,9 @@ export const initChatHandler = async (
       documentData.fullText
     );
     deleteFile(filename);
-    console.log(questions);
     questions = questions.replace(/^\s*\n/gm, "");
     questions = questions.split(/\r?\n/) as string[];
-    console.log("--------");
-    console.log(questions);
-    //
-    console.log("--------");
     if (questions.length === 4) questions.shift();
-    console.log(questions);
     return res.status(200).json({
       sessionId: req.session.id,
       summary: summary,
